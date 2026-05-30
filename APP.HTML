@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PC Manager</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:20px;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+}
+
+h1{
+text-align:center;
+}
+
+.card{
+background:white;
+padding:15px;
+margin:10px 0;
+border-radius:10px;
+box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+input,button{
+padding:10px;
+margin:5px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th{
+background:#3498db;
+color:white;
+padding:10px;
+}
+
+td{
+border:1px solid #ddd;
+padding:8px;
+text-align:center;
+}
+
+.free{
+color:green;
+font-weight:bold;
+}
+
+.backBtn{
+background:#e74c3c;
+color:white;
+border:none;
+padding:10px;
+cursor:pointer;
+border-radius:6px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<button class="backBtn" onclick="back()">⬅ BACK</button>
+
+<h1 id="title">PC Manager</h1>
+
+<div class="card">
+<h3>Search Time</h3>
+<input type="time" id="from" oninput="check()">
+<input type="time" id="to" oninput="check()">
+</div>
+
+<div class="card">
+<h3>Free PCs</h3>
+<div id="free"></div>
+</div>
+
+<div class="card">
+<h3>Students</h3>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Course</th>
+<th>In</th>
+<th>Out</th>
+<th>PC</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
+</div>
+
+<div class="card">
+<h3>Add Student</h3>
+
+<input id="name" placeholder="Name">
+<input id="course" placeholder="Course">
+<input id="in" type="time">
+<input id="out" type="time">
+<input id="pc" type="number">
+
+<button onclick="add()">Save</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* LAB LOAD */
+let lab = localStorage.getItem("currentLab");
+let students = JSON.parse(localStorage.getItem("lab"+lab)) || [];
+let editIndex = -1;
+
+document.getElementById("title").innerText =
+"💻 LAB " + lab + " PC Manager";
+
+/* LAB WISE LIMIT */
+function getPCLimit(){
+if(lab == 1) return 11;
+if(lab == 2) return 10;
+return 0;
+}
+
+function save(){
+localStorage.setItem("lab"+lab, JSON.stringify(students));
+render();
+check();
+}
+
+/* TIME */
+function timeToMin(t){
+if(!t) return 0;
+let [h,m] = t.split(":").map(Number);
+return h*60+m;
+}
+
+/* ADD */
+function add(){
+
+let obj = {
+name: document.getElementById("name").value,
+course: document.getElementById("course").value,
+in: document.getElementById("in").value,
+out: document.getElementById("out").value,
+pc: Number(document.getElementById("pc").value)
+};
+
+if(editIndex === -1){
+students.push(obj);
+}else{
+students[editIndex] = obj;
+editIndex = -1;
+}
+
+/* TIME SORT */
+students.sort((a,b)=>timeToMin(a.in)-timeToMin(b.in));
+
+save();
+clearForm();
+}
+
+/* DELETE */
+function del(i){
+students.splice(i,1);
+save();
+}
+
+/* EDIT */
+function edit(i){
+let s = students[i];
+
+document.getElementById("name").value = s.name;
+document.getElementById("course").value = s.course;
+document.getElementById("in").value = s.in;
+document.getElementById("out").value = s.out;
+document.getElementById("pc").value = s.pc;
+
+editIndex = i;
+}
+
+/* RENDER */
+function render(){
+
+let html = "";
+
+students.forEach((s,i)=>{
+html += `
+<tr>
+<td>${s.name}</td>
+<td>${s.course}</td>
+<td>${s.in}</td>
+<td>${s.out}</td>
+<td>${s.pc}</td>
+<td>
+<button onclick="edit(${i})">Edit</button>
+<button onclick="del(${i})">Delete</button>
+</td>
+</tr>`;
+});
+
+document.getElementById("table").innerHTML = html;
+}
+
+/* FREE PC + COUNT */
+function check(){
+
+let from = document.getElementById("from").value;
+let to = document.getElementById("to").value;
+
+if(!from || !to) return;
+
+let occupied = [];
+
+students.forEach(s=>{
+if(!(to <= s.in || from >= s.out)){
+occupied.push(s.pc);
+}
+});
+
+occupied = [...new Set(occupied)];
+
+let limit = getPCLimit();
+let free = [];
+
+for(let i=1;i<=limit;i++){
+if(!occupied.includes(i)){
+free.push(i);
+}
+}
+
+document.getElementById("free").innerHTML =
+"🟢 Free PCs: " + free.join(", ") +
+` <span style="float:right;font-weight:bold;color:#2c3e50;">
+Total Free PCs: ${free.length}
+</span>`;
+}
+
+/* CLEAR */
+function clearForm(){
+document.getElementById("name").value = "";
+document.getElementById("course").value = "";
+document.getElementById("in").value = "";
+document.getElementById("out").value = "";
+document.getElementById("pc").value = "";
+}
+
+/* BACK */
+function back(){
+window.location.href = "lab.html";
+}
+
+render();
+
+</script>
+
+</body>
+</html>

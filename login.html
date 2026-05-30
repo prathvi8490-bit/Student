@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f6f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.box{
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+text-align:center;
+width:300px;
+}
+
+input,button{
+width:90%;
+padding:10px;
+margin:8px;
+}
+
+button{
+background:#3498db;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:6px;
+}
+
+#error{color:red;}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2>🔐 Login</h2>
+
+<input id="uid" placeholder="User ID">
+<input id="pass" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<div id="error"></div>
+</div>
+
+<script>
+
+const USER="PRARTHVI";
+const PASS="26";
+
+function login(){
+let u=document.getElementById("uid").value;
+let p=document.getElementById("pass").value;
+
+if(u===USER && p===PASS){
+localStorage.setItem("login","true");
+window.location.href="lab.html";
+}else{
+document.getElementById("error").innerText="Wrong ID or Password";
+}
+}
+
+</script>
+
+</body>
+</html>

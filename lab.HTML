@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Select Lab</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f4f6f9;
+text-align:center;
+padding-top:222px;
+}
+
+button{
+padding:15px;
+width:200px;
+margin:10px;
+background:#3498db;
+color:white;
+border:none;
+border-radius:6px;
+font-size:16px;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h2> Select Lab</h2>
+
+<button onclick="openLab(1)">LAB 1</button>
+<button onclick="openLab(2)">LAB 2</button>
+
+<script>
+
+if(localStorage.getItem("login")!=="true"){
+window.location.href="login.html";
+}
+
+function openLab(n){
+localStorage.setItem("currentLab",n);
+window.location.href="app.html";
+}
+
+</script>
+
+</body>
+</html>
